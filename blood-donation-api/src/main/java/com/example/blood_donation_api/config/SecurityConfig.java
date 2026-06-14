@@ -2,6 +2,7 @@ package com.example.blood_donation_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.example.blood_donation_api.security.JwtAuthenticationFilter;
 import com.example.blood_donation_api.service.CustomUserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 
 @Configuration
@@ -44,8 +46,24 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http)
         .userDetailsService(userDetailsService)
 
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
+            .requestMatchers("/auth/**").permitAll()
+
+            .requestMatchers(HttpMethod.GET, "/donors")
+            .hasAnyRole("USER", "ADMIN")
+
+            .requestMatchers(HttpMethod.POST, "/donors")
+            .hasAnyRole("USER", "ADMIN")
+
+            .requestMatchers(HttpMethod.DELETE, "/donors/**")
+            .hasRole("ADMIN")
+
+            .requestMatchers(HttpMethod.GET, "/requests")
+            .hasAnyRole("USER", "ADMIN")
+
+            .requestMatchers(HttpMethod.POST, "/requests")
+            .hasAnyRole("USER", "ADMIN")
+
+            .anyRequest().authenticated()
         )
 
         .addFilterBefore(
