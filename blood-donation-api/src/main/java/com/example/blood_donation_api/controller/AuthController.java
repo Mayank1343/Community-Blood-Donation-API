@@ -24,15 +24,16 @@ private final AuthenticationManager authenticationManager;
 private final JwtService jwtService;
 
 
-public AuthController(UserRepository userRepository,
-PasswordEncoder passwordEncoder,
-AuthenticationManager authenticationManager,
-JwtService jwtService) {
+public AuthController(
+        AuthenticationManager authenticationManager,
+        JwtService jwtService,
+        PasswordEncoder passwordEncoder,
+        UserRepository userRepository) {
 
-this.userRepository = userRepository;
-this.passwordEncoder = passwordEncoder;
-this.authenticationManager = authenticationManager;
-this.jwtService = jwtService;
+    this.authenticationManager = authenticationManager;
+    this.jwtService = jwtService;
+    this.passwordEncoder = passwordEncoder;
+    this.userRepository = userRepository;
 }
 
 
