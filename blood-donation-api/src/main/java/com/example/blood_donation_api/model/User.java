@@ -1,4 +1,4 @@
-package model;
+package com.example.blood_donation_api.model;
 
 import jakarta.persistence.*;
 
