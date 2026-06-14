@@ -8,6 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.blood_donation_api.service.CustomUserDetailsService;
+
 @Configuration
 public class SecurityConfig {
 
@@ -16,12 +18,20 @@ public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
 }
 
+private final CustomUserDetailsService userDetailsService;
+
+public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    this.userDetailsService = userDetailsService;
+}
+
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http)
         throws Exception {
 
     http
             .csrf(csrf -> csrf.disable())
+
+            .userDetailsService(userDetailsService)
 
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()

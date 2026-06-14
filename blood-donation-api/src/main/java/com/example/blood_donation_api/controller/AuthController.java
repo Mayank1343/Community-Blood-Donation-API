@@ -8,6 +8,11 @@ import com.example.blood_donation_api.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.example.blood_donation_api.dto.LoginRequest;
+import com.example.blood_donation_api.dto.LoginResponse;
+import com.example.blood_donation_api.security.JwtService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @RestController
 @RequestMapping("/auth")
@@ -15,12 +20,21 @@ public class AuthController {
 
 private final UserRepository userRepository;
 private final PasswordEncoder passwordEncoder;
+private final AuthenticationManager authenticationManager;
+private final JwtService jwtService;
+
 
 public AuthController(UserRepository userRepository,
-                      PasswordEncoder passwordEncoder) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
+PasswordEncoder passwordEncoder,
+AuthenticationManager authenticationManager,
+JwtService jwtService) {
+
+this.userRepository = userRepository;
+this.passwordEncoder = passwordEncoder;
+this.authenticationManager = authenticationManager;
+this.jwtService = jwtService;
 }
+
 
 @PostMapping("/register")
 public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
@@ -47,6 +61,24 @@ public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
     userRepository.save(user);
 
     return new AuthResponse("User registered successfully");
+}
+
+@PostMapping("/login")
+public LoginResponse login(
+@Valid @RequestBody LoginRequest request) {
+
+authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+                request.getUsername(),
+                request.getPassword()
+        )
+);
+
+String token = jwtService.generateToken(
+        request.getUsername()
+);
+
+return new LoginResponse(token);
 }
 
 }
